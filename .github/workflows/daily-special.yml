@@ -10,6 +10,11 @@ on:
 permissions:
   contents: write
 
+# Prevents two runs from colliding if triggered at the same time
+concurrency:
+  group: daily-special
+  cancel-in-progress: false
+
 jobs:
   update-special:
     runs-on: ubuntu-latest
@@ -72,4 +77,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add special.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update daily special for $(date +%A)" && git push)
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            git commit -m "chore: update daily special for $(date +%A)"
+            git pull --rebase origin main
+            git push
+          fi

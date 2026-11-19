@@ -5,6 +5,9 @@ on:
     branches: [ main ]
     paths-ignore:
       - 'special.json'
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,7 +15,6 @@ permissions:
   id-token: write
 
 jobs:
-  # Job 1: Deploy to GitHub Pages (only runs on push or manual trigger)
   deploy:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
@@ -35,10 +37,9 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  # Job 2: Verify the live site is up and serving HTML
   health-check:
     needs: deploy
-    if: always() # Runs after deploy finishes, AND runs directly during scheduled cron triggers
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Wait for CDN propagation
