@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#faf7f2">
+  <meta name="description" content="Small-batch coffee, seasonal drinks, and good food at Roast & Code Cafe.">
+  <title>Roast & Code | Artisan Coffee</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <nav class="site-nav" aria-label="Main navigation">
+      <a class="logo" href="#home" aria-label="Roast and Code Cafe home">Roast <span>&</span> Code</a>
+      <div class="nav-actions">
+        <div class="links">
+          <a href="#menu">Menu</a>
+          <a href="#visit">Visit</a>
+        </div>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to night mode" title="Switch to night mode">☾ <span>Night</span></button>
+        <button class="cart-toggle" id="cart-toggle" type="button" aria-controls="cart-panel" aria-expanded="false">Cart <span class="cart-count" id="cart-count">0</span></button>
+      </div>
+    </nav>
+    <div class="hero-content" id="home">
+      <p class="eyebrow">A neighborhood coffee house</p>
+      <h1>Small-Batch Roasts.<br><em>Zero Downtime.</em></h1>
+      <p>Specialty coffee and fresh-from-the-kitchen favorites, brewed daily for builders and thinkers.</p>
+      <a href="#menu" class="btn">Explore the menu <span aria-hidden="true">↓</span></a>
+    </div>
+    <div class="hero-note" aria-hidden="true">GOOD COFFEE. GOOD COMPANY.</div>
+  </header>
+
+  <main>
+    <section class="container special-banner" aria-labelledby="special-title">
+      <div class="special-card">
+        <div>
+          <span class="badge">Today's special · <span id="special-day">Daily</span></span>
+          <h2 id="special-title">Honey Cinnamon Cortado</h2>
+          <p id="special-desc">Double shot espresso with local wildflower honey, steamed milk, and Ceylon cinnamon.</p>
+        </div>
+        <div class="special-action"><span class="price" id="special-price">$4.50</span><button class="add-button" type="button" data-add="Honey Cinnamon Cortado">Add to order <span aria-hidden="true">+</span></button></div>
+      </div>
+    </section>
+
+    <section class="container menu-section" id="menu" aria-labelledby="menu-heading">
+      <div class="section-heading">
+        <p class="eyebrow">Made with care, served with a smile</p>
+        <h2 id="menu-heading">Find your favorite</h2>
+        <p>From your first espresso to a long, lazy brunch.</p>
+      </div>
+      <div class="menu-filters" role="group" aria-label="Filter menu items">
+        <button class="filter-button active" type="button" data-filter="all" aria-pressed="true">Everything</button>
+        <button class="filter-button" type="button" data-filter="coffee" aria-pressed="false">Coffee</button>
+        <button class="filter-button" type="button" data-filter="tea" aria-pressed="false">Tea & more</button>
+        <button class="filter-button" type="button" data-filter="food" aria-pressed="false">Bakery & bites</button>
+      </div>
+      <div class="menu-grid" id="menu-grid">
+        <article class="card" data-category="coffee" data-name="House Espresso" data-price="3.25"><div class="item-icon" aria-hidden="true">☕</div><div><p class="item-type">Coffee · 2 oz</p><h3>House Espresso</h3><p>Rich chocolate notes with a bright, balanced finish.</p></div><div class="card-bottom"><span class="price">$3.25</span><button class="add-button" type="button" aria-label="Add House Espresso to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="coffee" data-name="Oat Milk Latte" data-price="5.25"><div class="item-icon" aria-hidden="true">🥛</div><div><p class="item-type">Coffee · 12 oz</p><h3>Oat Milk Latte</h3><p>Our signature espresso with silky, lightly sweet oat milk.</p></div><div class="card-bottom"><span class="price">$5.25</span><button class="add-button" type="button" aria-label="Add Oat Milk Latte to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="coffee" data-name="Maple Cold Brew" data-price="5.50"><div class="item-icon" aria-hidden="true">🧊</div><div><p class="item-type">Coffee · 16 oz</p><h3>Maple Cold Brew</h3><p>Slow-steeped for 18 hours and finished with a touch of maple.</p></div><div class="card-bottom"><span class="price">$5.50</span><button class="add-button" type="button" aria-label="Add Maple Cold Brew to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="coffee" data-name="Vanilla Bean Flat White" data-price="4.75"><div class="item-icon" aria-hidden="true">🤎</div><div><p class="item-type">Coffee · 8 oz</p><h3>Vanilla Bean Flat White</h3><p>Double espresso, velvety milk, and house-made vanilla syrup.</p></div><div class="card-bottom"><span class="price">$4.75</span><button class="add-button" type="button" aria-label="Add Vanilla Bean Flat White to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="tea" data-name="Matcha Cloud" data-price="5.75"><div class="item-icon" aria-hidden="true">🍵</div><div><p class="item-type">Tea · 12 oz</p><h3>Matcha Cloud</h3><p>Stone-ground Japanese matcha whisked smooth with your choice of milk.</p></div><div class="card-bottom"><span class="price">$5.75</span><button class="add-button" type="button" aria-label="Add Matcha Cloud to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="tea" data-name="Ginger Peach Iced Tea" data-price="4.25"><div class="item-icon" aria-hidden="true">🍑</div><div><p class="item-type">Tea · 16 oz</p><h3>Ginger Peach Iced Tea</h3><p>Black tea, ripe peach, and a warming hint of fresh ginger.</p></div><div class="card-bottom"><span class="price">$4.25</span><button class="add-button" type="button" aria-label="Add Ginger Peach Iced Tea to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="food" data-name="Almond Croissant" data-price="4.50"><div class="item-icon" aria-hidden="true">🥐</div><div><p class="item-type">Bakery · baked daily</p><h3>Almond Croissant</h3><p>Buttery, flaky layers filled with almond cream and toasted almonds.</p></div><div class="card-bottom"><span class="price">$4.50</span><button class="add-button" type="button" aria-label="Add Almond Croissant to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="food" data-name="Avocado Toast" data-price="9.50"><div class="item-icon" aria-hidden="true">🥑</div><div><p class="item-type">Kitchen · all day</p><h3>Avocado Toast</h3><p>Smashed avocado, lemon, chili flakes, and herbs on sourdough.</p></div><div class="card-bottom"><span class="price">$9.50</span><button class="add-button" type="button" aria-label="Add Avocado Toast to cart">Add <span aria-hidden="true">+</span></button></div></article>
+        <article class="card" data-category="food" data-name="Blueberry Oat Muffin" data-price="3.75"><div class="item-icon" aria-hidden="true">🫐</div><div><p class="item-type">Bakery · baked daily</p><h3>Blueberry Oat Muffin</h3><p>Juicy blueberries, rolled oats, and a golden crumb topping.</p></div><div class="card-bottom"><span class="price">$3.75</span><button class="add-button" type="button" aria-label="Add Blueberry Oat Muffin to cart">Add <span aria-hidden="true">+</span></button></div></article>
+      </div>
+    </section>
+
+    <section class="visit-strip" id="visit">
+      <div class="visit-inner"><div><p class="eyebrow">Your table's waiting</p><h2>Make yourself at home.</h2><p>Bring a book, bring a friend, or just bring your appetite.</p></div><div class="visit-details"><p><strong>Open daily</strong><br>7:00 AM – 6:00 PM</p><p><strong>Find us</strong><br>127.0.0.1 Localhost Ave</p></div></div>
+    </section>
+  </main>
+
+  <aside class="cart-panel" id="cart-panel" aria-label="Your cart" aria-hidden="true">
+    <div class="cart-header"><div><p class="eyebrow">Almost yours</p><h2>Your order</h2></div><button id="close-cart" class="icon-button" type="button" aria-label="Close cart">×</button></div>
+    <div class="cart-items" id="cart-items"><p class="empty-cart">Your cart is waiting for something delicious.</p></div>
+    <div class="cart-footer"><div class="cart-total"><span>Total</span><strong id="cart-total">$0.00</strong></div><button class="checkout-button" id="checkout-button" type="button" disabled>Place order <span aria-hidden="true">→</span></button><p class="checkout-note">Demo checkout · no payment is collected.</p><p class="order-message" id="order-message" role="status" aria-live="polite"></p></div>
+  </aside>
+  <div class="cart-backdrop" id="cart-backdrop" hidden></div>
+
+  <footer><p class="logo">Roast <span>&</span> Code</p><p>Good coffee for good company.</p><p class="status">Freshly brewed every day. See you soon!</p></footer>
+
+  <script>
+    // Replace this placeholder with the cafe's real order inbox when configuring email delivery.
+    const ORDER_EMAIL = 'orders@example.com';
+    const cart = new Map();
+    const cartPanel = document.getElementById('cart-panel');
+    const cartBackdrop = document.getElementById('cart-backdrop');
+    const money = amount => `$${amount.toFixed(2)}`;
+
+    // Load today's special when available; the built-in content remains as a fallback.
+    fetch(`special.json?t=${Date.now()}`).then(response => {
+      if (!response.ok) throw new Error('Special unavailable');
+      return response.json();
+    }).then(data => {
+      document.getElementById('special-day').textContent = data.day;
+      document.getElementById('special-title').textContent = data.drink;
+      document.getElementById('special-desc').textContent = data.description;
+      document.getElementById('special-price').textContent = data.price;
+      const price = Number(String(data.price).replace(/[^\d.]/g, ''));
+      if (Number.isFinite(price)) {
+        const specialCard = document.querySelector('.special-card');
+        specialCard.dataset.name = data.drink;
+        specialCard.dataset.price = price;
+      }
+    }).catch(() => {});
+
+    function setCartOpen(open) {
+      cartPanel.classList.toggle('open', open);
+      cartPanel.setAttribute('aria-hidden', String(!open));
+      document.getElementById('cart-toggle').setAttribute('aria-expanded', String(open));
+      cartBackdrop.hidden = !open;
+      document.body.classList.toggle('cart-open', open);
+      if (open) document.getElementById('close-cart').focus();
+    }
+
+    function addToCart(name, price) {
+      const item = cart.get(name) || { name, price, quantity: 0 };
+      item.quantity += 1;
+      cart.set(name, item);
+      renderCart();
+      document.getElementById('order-message').textContent = '';
+    }
+
+    function renderCart() {
+      const items = [...cart.values()];
+      const count = items.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+      document.getElementById('cart-items').innerHTML = items.length ? items.map(item => `
+        <div class="cart-item">
+          <div><h3>${escapeHTML(item.name)}</h3><p>${money(item.price)} each</p></div>
+          <div class="quantity-control"><button type="button" data-quantity="${escapeHTML(item.name)}" data-change="-1" aria-label="Remove one ${escapeHTML(item.name)}">−</button><span>${item.quantity}</span><button type="button" data-quantity="${escapeHTML(item.name)}" data-change="1" aria-label="Add one ${escapeHTML(item.name)}">+</button></div>
+        </div>`).join('') : '<p class="empty-cart">Your cart is waiting for something delicious.</p>';
+      const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      document.getElementById('cart-total').textContent = money(total);
+      document.getElementById('checkout-button').disabled = items.length === 0;
+    }
+
+    function escapeHTML(value) {
+      return value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+    }
+
+    document.getElementById('menu-grid').addEventListener('click', event => {
+      const button = event.target.closest('.add-button');
+      if (!button) return;
+      const card = button.closest('.card');
+      addToCart(card.dataset.name, Number(card.dataset.price));
+      button.classList.add('just-added');
+      button.innerHTML = 'Added <span aria-hidden="true">✓</span>';
+      window.setTimeout(() => { button.classList.remove('just-added'); button.innerHTML = 'Add <span aria-hidden="true">+</span>'; }, 900);
+    });
+
+    document.querySelector('.special-card').addEventListener('click', event => {
+      const button = event.target.closest('.add-button');
+      if (!button) return;
+      const card = button.closest('.special-card');
+      addToCart(card.dataset.name || document.getElementById('special-title').textContent, Number(card.dataset.price) || 4.5);
+      button.innerHTML = 'Added <span aria-hidden="true">✓</span>';
+      window.setTimeout(() => { button.innerHTML = 'Add to order <span aria-hidden="true">+</span>'; }, 900);
+    });
+
+    document.getElementById('cart-items').addEventListener('click', event => {
+      const button = event.target.closest('[data-quantity]');
+      if (!button) return;
+      const item = cart.get(button.dataset.quantity);
+      if (!item) return;
+      item.quantity += Number(button.dataset.change);
+      if (item.quantity <= 0) cart.delete(item.name);
+      renderCart();
+    });
+
+    document.querySelectorAll('.filter-button').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('.filter-button').forEach(filter => {
+        const active = filter === button;
+        filter.classList.toggle('active', active);
+        filter.setAttribute('aria-pressed', String(active));
+      });
+      document.querySelectorAll('.card').forEach(card => {
+        card.hidden = button.dataset.filter !== 'all' && card.dataset.category !== button.dataset.filter;
+      });
+    }));
+
+    document.getElementById('cart-toggle').addEventListener('click', () => setCartOpen(true));
+    document.getElementById('close-cart').addEventListener('click', () => setCartOpen(false));
+    cartBackdrop.addEventListener('click', () => setCartOpen(false));
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') setCartOpen(false); });
+
+    document.getElementById('checkout-button').addEventListener('click', () => {
+      const items = [...cart.values()];
+      if (!items.length) return;
+      const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const order = items.map(item => `${item.quantity} x ${item.name} (${money(item.price * item.quantity)})`).join('\n');
+      const subject = encodeURIComponent('New Roast & Code Cafe order');
+      const body = encodeURIComponent(`A demo order has been placed:\n\n${order}\n\nTotal: ${money(total)}\n\nPlease confirm this order with the customer.`);
+      document.getElementById('order-message').textContent = 'Order prepared! Your email app will open with the order details. This demo does not collect payment.';
+      // mailto opens the customer's email app; automated sending requires a backend or email service.
+      window.location.href = `mailto:${ORDER_EMAIL}?subject=${subject}&body=${body}`;
+    });
+
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('roast-code-theme');
+    if (savedTheme === 'night') document.body.classList.add('night-mode');
+    function updateThemeButton() {
+      const night = document.body.classList.contains('night-mode');
+      themeToggle.innerHTML = night ? '☀ <span>Day</span>' : '☾ <span>Night</span>';
+      themeToggle.setAttribute('aria-label', night ? 'Switch to day mode' : 'Switch to night mode');
+      themeToggle.title = night ? 'Switch to day mode' : 'Switch to night mode';
+    }
+    updateThemeButton();
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('night-mode');
+      localStorage.setItem('roast-code-theme', document.body.classList.contains('night-mode') ? 'night' : 'day');
+      updateThemeButton();
+    });
+  </script>
+</body>
+</html>
