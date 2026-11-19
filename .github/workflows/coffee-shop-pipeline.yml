@@ -1,0 +1,144 @@
+name: Coffee Shop CI/CD & Daily Special
+
+on:
+  # 1. Runs when you push code updates to main
+  push:
+    branches: [ main ]
+  # 2. Runs daily at 02:17 UTC (7:17 AM PKT) to rotate the special & redeploy
+  schedule:
+    - cron: '17 2 * * *'
+  # 3. Allows manual runs anytime from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: coffee-shop-pipeline
+  cancel-in-progress: false
+
+jobs:
+  # JOB 1: Update special.json (runs on daily schedule or manual trigger)
+  update-special:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate today's special
+        run: |
+          DAY=$(TZ='Asia/Karachi' date +%A)
+          case "$DAY" in
+            Monday)
+              DRINK="Maple Bourbon Latte"
+              DESC="Double espresso, steamed oat milk, and pure Vermont maple syrup."
+              PRICE="\$5.25"
+              ;;
+            Tuesday)
+              DRINK="Cardamom Rose Cold Brew"
+              DESC="18-hour steeped cold brew infused with crushed green cardamom and rosewater."
+              PRICE="\$5.00"
+              ;;
+            Wednesday)
+              DRINK="Honey Cinnamon Cortado"
+              DESC="Double shot espresso with local wildflower honey and Ceylon cinnamon."
+              PRICE="\$4.50"
+              ;;
+            Thursday)
+              DRINK="Salted Caramel Flat White"
+              DESC="Velvety micro-foam over ristretto shots with house-made sea salt caramel."
+              PRICE="\$4.95"
+              ;;
+            Friday)
+              DRINK="Espresso Tonic"
+              DESC="Chilled single-origin espresso floated over botanical tonic water and orange peel."
+              PRICE="\$4.75"
+              ;;
+            Saturday)
+              DRINK="Kenyan AA Pour-Over"
+              DESC="Hand-brewed V60 with bright notes of blackcurrant, grapefruit, and cane sugar."
+              PRICE="\$5.50"
+              ;;
+            Sunday)
+              DRINK="Mocha Hazelnut Cappuccino"
+              DESC="Dark 70% cocoa ganache melted into espresso with roasted hazelnut foam."
+              PRICE="\$5.15"
+              ;;
+          esac
+
+          cat <<EOF > special.json
+          {
+            "day": "$DAY",
+            "drink": "$DRINK",
+            "description": "$DESC",
+            "price": "$PRICE"
+          }
+          EOF
+
+      - name: Commit and push updated special
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add special.json
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            git commit -m "chore: update daily special for $(TZ='Asia/Karachi' date +%A)"
+            git pull --rebase -X theirs origin main
+            git push
+          fi
+
+  # JOB 2: Deploy latest files (including updated special.json) to GitHub Pages
+  deploy:
+    needs: update-special
+    if: always()
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout latest main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static files
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # JOB 3: Verify the live website and special.json
+  health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for CDN propagation
+        run: sleep 10
+
+      - name: Verify live site and special.json
+        run: |
+          BASE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          echo "Checking $BASE_URL/"
+
+          STATUS=$(curl -s -o page.html -w "%{http_code}" "$BASE_URL/")
+          if [ "$STATUS" -ne 200 ] || ! grep -q "Roast & Code" page.html; then
+            echo "Alert: Main page check failed (HTTP $STATUS)"
+            exit 1
+          fi
+
+          JSON_STATUS=$(curl -s -o special.json -w "%{http_code}" "$BASE_URL/special.json")
+          if [ "$JSON_STATUS" -ne 200 ]; then
+            echo "Alert: special.json returned HTTP $JSON_STATUS"
+            exit 1
+          fi
+
+          echo "Live special.json content:"
+          cat special.json
