@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Status | Roast & Code</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="status-header">
+    <nav>
+      <div class="logo"><a href="index.html" class="logo-link">Roast & Code</a></div>
+      <div class="links">
+        <a href="index.html">Home</a>
+        <a href="index.html#menu">Menu</a>
+        <a href="status.html" class="active-link">System Status</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Overall System Banner -->
+    <div id="system-banner" class="status-banner operational">
+      <div class="status-indicator">
+        <span class="pulse-dot"></span>
+        <h1 id="overall-status">Checking Systems...</h1>
+      </div>
+      <p id="last-checked">Querying GitHub Actions & Pages endpoints...</p>
+    </div>
+
+    <!-- Live Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="card">
+        <h4>Storefront & CDN</h4>
+        <p id="site-ping">Testing latency...</p>
+        <span class="badge-ok" id="site-badge">Checking</span>
+      </div>
+      <div class="card">
+        <h4>Active Daily Special</h4>
+        <p id="live-special-name">Fetching special.json...</p>
+        <span class="badge-ok" id="special-day-badge">Synced</span>
+      </div>
+      <div class="card">
+        <h4>CI/CD Pipeline</h4>
+        <p id="success-rate">Calculating recent runs...</p>
+        <span class="badge-ok">GitHub Actions</span>
+      </div>
+    </div>
+
+    <!-- Recent GitHub Actions Workflow Runs -->
+    <section class="runs-section">
+      <div class="runs-header">
+        <h2>Recent Automation Runs</h2>
+        <button id="refresh-btn" class="btn-small">Refresh Logs</button>
+      </div>
+      <div id="runs-list" class="runs-list">
+        <div class="run-row">Loading workflow history from GitHub API...</div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="visit">
+    <p><strong>Open Daily:</strong> 7:00 AM – 6:00 PM | 127.0.0.1 Localhost Ave</p>
+    <p class="status">Live telemetry powered by GitHub REST API & GitHub Actions.</p>
+  </footer>
+
+  <script>
+    const OWNER = 'InventiveBear';
+    const REPO = 'roast-and-code-cafe';
+
+    async function loadDashboard() {
+      const banner = document.getElementById('system-banner');
+      const overallText = document.getElementById('overall-status');
+      const lastChecked = document.getElementById('last-checked');
+
+      // 1. Measure storefront & special.json latency
+      const startTime = performance.now();
+      try {
+        const specialRes = await fetch('special.json?t=' + Date.now());
+        const latency = Math.round(performance.now() - startTime);
+        const specialData = await specialRes.json();
+
+        document.getElementById('site-ping').textContent = `HTTP 200 OK • ${latency}ms response`;
+        document.getElementById('live-special-name').textContent = `${specialData.drink} (${specialData.price})`;
+        document.getElementById('special-day-badge').textContent = specialData.day;
+      } catch (err) {
+        document.getElementById('site-ping').textContent = 'Endpoint unreachable';
+        document.getElementById('site-badge').textContent = 'Degraded';
+        document.getElementById('site-badge').className = 'badge-err';
+      }
+
+      // 2. Fetch recent GitHub Actions workflow runs
+      try {
+        const apiUrl = `https://api.github.com/repos/${OWNER}/${REPO}/actions/runs?per_page=8`;
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        const runs = data.workflow_runs || [];
+
+        const runsList = document.getElementById('runs-list');
+        runsList.innerHTML = '';
+
+        if (runs.length === 0) {
+          runsList.innerHTML = '<div class="run-row">No workflow runs found yet.</div>';
+          return;
+        }
+
+        let passed = 0;
+        runs.forEach(run => {
+          if (run.conclusion === 'success') passed++;
+
+          const isSuccess = run.conclusion === 'success';
+          const isRunning = run.status !== 'completed';
+          const statusLabel = isRunning ? 'Running' : (run.conclusion || 'Unknown');
+          const badgeClass = isRunning ? 'badge-warn' : (isSuccess ? 'badge-ok' : 'badge-err');
+
+          const date = new Date(run.created_at).toLocaleString([], {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+
+          const row = document.createElement('div');
+          row.className = 'run-row';
+          row.innerHTML = `
+            <div class="run-info">
+              <strong>${run.name}</strong>
+              <span class="run-meta">#${run.run_number} • Triggered via <code>${run.event}</code> • ${date}</span>
+            </div>
+            <div class="run-actions">
+              <span class="${badgeClass}">${statusLabel}</span>
+              <a href="${run.html_url}" target="_blank" rel="noopener" class="log-link">Logs ↗</a>
+            </div>
+          `;
+          runsList.appendChild(row);
+        });
+
+        const rate = Math.round((passed / runs.length) * 100);
+        document.getElementById('success-rate').textContent = `${passed}/${runs.length} recent runs passed (${rate}%)`;
+
+        // Update top banner based on the latest workflow run
+        const latest = runs[0];
+        if (latest.conclusion === 'failure') {
+          banner.className = 'status-banner degraded';
+          overallText.textContent = 'Latest Pipeline Run Failed';
+        } else {
+          banner.className = 'status-banner operational';
+          overallText.textContent = 'All Systems Operational';
+        }
+
+        lastChecked.textContent = `Last synced: ${new Date().toLocaleTimeString()}`;
+      } catch (error) {
+        overallText.textContent = 'GitHub API Rate Limit Reached';
+        lastChecked.textContent = 'Unable to fetch live workflow runs right now.';
+      }
+    }
+
+    document.getElementById('refresh-btn').addEventListener('click', loadDashboard);
+    loadDashboard();
+  </script>
+</body>
+</html>

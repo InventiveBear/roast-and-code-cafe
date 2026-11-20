@@ -142,3 +142,9 @@ jobs:
 
           echo "Live special.json content:"
           cat special.json
+
+STATUS_PAGE=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/status.html")
+          if [ "$STATUS_PAGE" -ne 200 ]; then
+            echo "Alert: status.html returned HTTP $STATUS_PAGE"
+            exit 1
+          fi
