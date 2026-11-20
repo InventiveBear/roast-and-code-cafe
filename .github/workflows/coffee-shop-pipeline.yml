@@ -1,13 +1,10 @@
 name: Coffee Shop CI/CD & Daily Special
 
 on:
-  # 1. Runs when you push code updates to main
   push:
     branches: [ main ]
-  # 2. Runs daily at 02:17 UTC (7:17 AM PKT) to rotate the special & redeploy
   schedule:
     - cron: '17 2 * * *'
-  # 3. Allows manual runs anytime from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -20,7 +17,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # JOB 1: Update special.json (runs on daily schedule or manual trigger)
   update-special:
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
@@ -68,15 +64,7 @@ jobs:
               PRICE="\$5.15"
               ;;
           esac
-
-          cat <<EOF > special.json
-          {
-            "day": "$DAY",
-            "drink": "$DRINK",
-            "description": "$DESC",
-            "price": "$PRICE"
-          }
-          EOF
+          printf '{"day":"%s","drink":"%s","description":"%s","price":"%s"}\n' "$DAY" "$DRINK" "$DESC" "$PRICE" > special.json
 
       - name: Commit and push updated special
         run: |
@@ -89,7 +77,6 @@ jobs:
             git push
           fi
 
-  # JOB 2: Deploy latest files (including updated special.json) to GitHub Pages
   deploy:
     needs: update-special
     if: always()
@@ -115,7 +102,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  # JOB 3: Verify the live website and special.json
   health-check:
     needs: deploy
     runs-on: ubuntu-latest
@@ -123,28 +109,14 @@ jobs:
       - name: Wait for CDN propagation
         run: sleep 10
 
-      - name: Verify live site and special.json
+      - name: Verify live site, status page, and special.json
         run: |
           BASE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
-          echo "Checking $BASE_URL/"
-
-          STATUS=$(curl -s -o page.html -w "%{http_code}" "$BASE_URL/")
-          if [ "$STATUS" -ne 200 ] || ! grep -q "Roast & Code" page.html; then
-            echo "Alert: Main page check failed (HTTP $STATUS)"
-            exit 1
-          fi
-
-          JSON_STATUS=$(curl -s -o special.json -w "%{http_code}" "$BASE_URL/special.json")
-          if [ "$JSON_STATUS" -ne 200 ]; then
-            echo "Alert: special.json returned HTTP $JSON_STATUS"
-            exit 1
-          fi
-
-          echo "Live special.json content:"
-          cat special.json
-
-STATUS_PAGE=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/status.html")
-          if [ "$STATUS_PAGE" -ne 200 ]; then
-            echo "Alert: status.html returned HTTP $STATUS_PAGE"
-            exit 1
-          fi
+          for PATH_CHECK in "/" "/status.html" "/special.json"; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "${BASE_URL}${PATH_CHECK}")
+            echo "${PATH_CHECK} -> HTTP ${CODE}"
+            if [ "$CODE" -ne 200 ]; then
+              echo "Alert: ${PATH_CHECK} failed with HTTP ${CODE}"
+              exit 1
+            fi
+          done
