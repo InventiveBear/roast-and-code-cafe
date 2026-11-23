@@ -55,4 +55,4 @@ Push changes to the configured branch to trigger the repository’s CI/CD pipeli
 
 ## License
 
-No license has been specified. Add a `LICENSE` file before permitting reuse or redistribution.
+MIT 
