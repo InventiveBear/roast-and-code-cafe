@@ -1,4 +1,83 @@
-build:
+name: Coffee Shop CI/CD & Daily Special
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: coffee-shop-pipeline
+  cancel-in-progress: false
+
+jobs:
+  update-special:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate today's special
+        run: |
+          DAY=$(TZ='Asia/Karachi' date +%A)
+          case "$DAY" in
+            Monday)
+              DRINK="Maple Bourbon Latte"
+              DESC="Double espresso, steamed oat milk, and pure Vermont maple syrup."
+              PRICE="$5.25"
+              ;;
+            Tuesday)
+              DRINK="Cardamom Rose Cold Brew"
+              DESC="18-hour steeped cold brew infused with crushed green cardamom and rosewater."
+              PRICE="$5.00"
+              ;;
+            Wednesday)
+              DRINK="Honey Cinnamon Cortado"
+              DESC="Double shot espresso with local wildflower honey and Ceylon cinnamon."
+              PRICE="$4.50"
+              ;;
+            Thursday)
+              DRINK="Salted Caramel Flat White"
+              DESC="Velvety micro-foam over ristretto shots with house-made sea salt caramel."
+              PRICE="$4.95"
+              ;;
+            Friday)
+              DRINK="Espresso Tonic"
+              DESC="Chilled single-origin espresso floated over botanical tonic water and orange peel."
+              PRICE="$4.75"
+              ;;
+            Saturday)
+              DRINK="Kenyan AA Pour-Over"
+              DESC="Hand-brewed V60 with bright notes of blackcurrant, grapefruit, and cane sugar."
+              PRICE="$5.50"
+              ;;
+            Sunday)
+              DRINK="Mocha Hazelnut Cappuccino"
+              DESC="Dark 70% cocoa ganache melted into espresso with roasted hazelnut foam."
+              PRICE="$5.15"
+              ;;
+          esac
+          printf '{"day":"%s","drink":"%s","description":"%s","price":"%s"}\n' "$DAY" "$DRINK" "$DESC" "$PRICE" > special.json
+
+      - name: Commit and push updated special
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add special.json
+          if ! git diff --quiet || ! git diff --staged --quiet; then
+            git commit -m "chore: update daily special for $(TZ='Asia/Karachi' date +%A)"
+            git pull --rebase -X theirs origin main
+            git push
+          fi
+
+  build:
     needs: update-special
     if: always()
     runs-on: ubuntu-latest
@@ -26,3 +105,22 @@ build:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  health-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for CDN propagation
+        run: sleep 10
+
+      - name: Verify live site, status page, and special.json
+        run: |
+          BASE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          for PATH_CHECK in "/" "/status.html" "/special.json"; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "${BASE_URL}${PATH_CHECK}")
+            echo "${PATH_CHECK} -> HTTP ${CODE}"
+            if [ "$CODE" -ne 200 ]; then
+              echo "Alert: ${PATH_CHECK} failed with HTTP ${CODE}"
+              exit 1
+            fi
+          done
