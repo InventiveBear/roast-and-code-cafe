@@ -31,37 +31,37 @@ jobs:
             Monday)
               DRINK="Maple Bourbon Latte"
               DESC="Double espresso, steamed oat milk, and pure Vermont maple syrup."
-              PRICE="$5.25"
+              PRICE='$5.25'
               ;;
             Tuesday)
               DRINK="Cardamom Rose Cold Brew"
               DESC="18-hour steeped cold brew infused with crushed green cardamom and rosewater."
-              PRICE="$5.00"
+              PRICE='$5.00'
               ;;
             Wednesday)
               DRINK="Honey Cinnamon Cortado"
               DESC="Double shot espresso with local wildflower honey and Ceylon cinnamon."
-              PRICE="$4.50"
+              PRICE='$4.50'
               ;;
             Thursday)
               DRINK="Salted Caramel Flat White"
               DESC="Velvety micro-foam over ristretto shots with house-made sea salt caramel."
-              PRICE="$4.95"
+              PRICE='$4.95'
               ;;
             Friday)
               DRINK="Espresso Tonic"
               DESC="Chilled single-origin espresso floated over botanical tonic water and orange peel."
-              PRICE="$4.75"
+              PRICE='$4.75'
               ;;
             Saturday)
               DRINK="Kenyan AA Pour-Over"
               DESC="Hand-brewed V60 with bright notes of blackcurrant, grapefruit, and cane sugar."
-              PRICE="$5.50"
+              PRICE='$5.50'
               ;;
             Sunday)
               DRINK="Mocha Hazelnut Cappuccino"
               DESC="Dark 70% cocoa ganache melted into espresso with roasted hazelnut foam."
-              PRICE="$5.15"
+              PRICE='$5.15'
               ;;
           esac
           printf '{"day":"%s","drink":"%s","description":"%s","price":"%s"}\n' "$DAY" "$DRINK" "$DESC" "$PRICE" > special.json
